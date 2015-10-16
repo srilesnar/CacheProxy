@@ -7,6 +7,13 @@
 var debug = require('debug')('cache-proxy:server');
 var http = require('http');
 var prox = require('proxs');
+var config = require('./configHelper');
+
+
+
+var cacheDuration = "cache_config:cacheDuration";
+var cacheSizeBytes = "cache_config:cacheSizeBytes";
+var cacheSizeElements = "cache_config:cacheSizeElements";
 
 var port = normalizePort(process.env.PORT || '8080');
 
@@ -14,7 +21,7 @@ var server = http.createServer(handleRequest);
 
 function handleRequest(request , response){
   var startTime = new Date().getTime();
-  prox.forwardRequest(request, function(data){
+  prox.forwardRequest(request, config.getValue(cacheDuration), config.getValue(cacheSizeBytes), config.getValue(cacheSizeElements), function(data){
     var latency = new Date().getTime() - startTime;
     response.end('Data response: ' + data +"------ Total latency: " + latency +" ms");
   });
